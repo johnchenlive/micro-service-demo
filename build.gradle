@@ -1,0 +1,76 @@
+buildscript {
+	repositories {
+		mavenCentral()
+		maven { url 'https://repo.spring.io/milestone' }
+		maven { url "https://plugins.gradle.org/m2/" }
+	}
+	dependencies {
+		classpath "org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}"
+		classpath "gradle.plugin.com.gorylenko.gradle-git-properties:gradle-git-properties:${gradleGitPropertiesVersion}"
+		classpath "gradle.plugin.com.github.spotbugs:gradlePlugin:${spotBugsVersion}"
+		classpath "cz.malohlava:visteg:1.0.3"
+	}
+}
+
+apply plugin: 'java'
+apply plugin: 'eclipse'
+apply plugin: 'io.spring.dependency-management'
+apply plugin: 'org.springframework.boot'
+apply plugin: 'com.gorylenko.gradle-git-properties'     // add git commit info to actuator info end-point
+apply plugin: "cz.malohlava" //enable this plugin if you want to visualize the build task dependencies
+
+
+group = "${componentOrganization}"
+version = "${componentVersion}"
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+springBoot  {
+    buildInfo()	// build info for actuator info end-point
+}
+
+bootRun {
+    // pass JVM options from gradle command line to bootRun task
+    def jvmArgsList = []
+    System.properties.findAll { key, value -> key.startsWith("spring.") }.each { key, value -> jvmArgsList << "-D$key=$value"  }
+    jvmArgs = jvmArgsList
+}
+
+
+configurations {
+    // exclude logging dependencies; keep SLF4J + spring-jcl provided by Spring and SpringBoot
+    all*.exclude module: 'log4j-slf4j-impl'  // org.apache.logging.log4j:log4j-slf4j-impl
+    all*.exclude module: 'slf4j-log4j12'     // org.slf4j:slf4j-log4j12
+    all*.exclude module: 'jcl-over-slf4j'    // org.slf4j:jcl-over-slf4j
+    all*.exclude module: 'commons-logging'   // commons-logging:commons-logging
+    all*.exclude module: 'log4j-core'        // org.apache.logging.log4j:log4j-core
+    all*.exclude module: 'log4j-web'         // org.apache.logging.log4j:log4j-web
+    all*.exclude module: 'log4j-api' 		 // org.apache.logging.log4j:log4j-api
+    all*.exclude module: 'log4j-1.2-api'     // org.apache.logging.log4j:log4j-1.2-api
+    all*.exclude module: 'log4j'             // log4j:log4j
+
+	// remove android-json from test configuration (added by spring-boot-starter-test)
+	// it includes version of org.json:json which is in conflict with version of org.json:json
+	// added by spring-boot-starter-web
+	testCompile.exclude module: 'android-json'
+}
+
+repositories {
+
+	mavenCentral()
+	mavenLocal()
+	maven { url 'https://repo.spring.io/milestone' }
+}
+
+
+dependencies {
+         
+	compile 'org.springframework.boot:spring-boot-starter-web'
+    compile 'org.springframework.boot:spring-boot-starter-security'
+    compile 'org.springframework.boot:spring-boot-starter-actuator'
+    compile 'org.springframework.boot:spring-boot-starter-data-jpa'
+    compile 'org.springframework.boot:spring-boot-starter-test'
+    compile 'com.h2database:h2'
+	
+}
