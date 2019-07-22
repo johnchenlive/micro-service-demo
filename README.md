@@ -1,5 +1,8 @@
 # micro-service-demo
 
+This Spring Boot microservice will convert an integer to its Roman numeral representation. 
+It's built by Gradle. It packages to a single jar file micro-service-demo-0.0.1.jar. It's easy to be deployed to a container like Docker. The DevOps capabilities for metrics, monitoring, and logging are provided as well.
+
 ## Development and Local test
 
 
@@ -47,6 +50,8 @@ Using generated security password: ca792fdc-1689-4b7f-8d78-5f578af223b9
 ## Management Endpoints
 
 All management endpoints are exposed on port 9000.
+The login page will be displayed if this is the first request.
+The login credentials are the same as above.
 
 ### Monitoring
 Two endpoints are avaialble for the monitoring purposes.
